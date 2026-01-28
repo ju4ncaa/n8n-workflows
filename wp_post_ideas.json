@@ -1,0 +1,473 @@
+{
+  "name": "wp_post_ideas",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Dmv-XcSG59g1ktLPGRJRBVrxYOpxRPYFoh6zbDcKnRU",
+          "mode": "list",
+          "cachedResultName": "WP Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Dmv-XcSG59g1ktLPGRJRBVrxYOpxRPYFoh6zbDcKnRU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Pruebas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Dmv-XcSG59g1ktLPGRJRBVrxYOpxRPYFoh6zbDcKnRU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha": "={{ $json.Fecha }}",
+            "Titulo": "={{ $json.Titulo }}",
+            "Tono": "={{ $json.Tono }}",
+            "Status": "={{ $json.Status }}",
+            "wp_status": "={{ $json.wp_status }}",
+            "Descripcion": "={{ $json.Descripcion }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Titulo",
+              "displayName": "Titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Descripcion",
+              "displayName": "Descripcion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tono",
+              "displayName": "Tono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "wp_status",
+              "displayName": "wp_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "wp_post_id",
+              "displayName": "wp_post_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -32,
+        -656
+      ],
+      "id": "bd8a0df6-d9fd-456c-8717-0f8d4fbd7cbb",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WIlFz1tEvPZY3dpr",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ff8baed-2686-40d9-820e-f754fb5526d4",
+              "name": "url_web",
+              "value": "https://aridosgarciadelgado.com/",
+              "type": "string"
+            },
+            {
+              "id": "64cb7558-7bb7-4a19-b608-faacf11bef0c",
+              "name": "num_posts",
+              "value": 12,
+              "type": "number"
+            },
+            {
+              "id": "3e1791e0-282d-4f69-a4c5-f676cb3c9ded",
+              "name": "language",
+              "value": "Español",
+              "type": "string"
+            },
+            {
+              "id": "4f2b6afd-337e-492c-91d1-2511eb230812",
+              "name": "tono",
+              "value": "profesional y cercano",
+              "type": "string"
+            },
+            {
+              "id": "4245707c-28b0-4106-b553-d7f0025add6c",
+              "name": "wp_status",
+              "value": "draft",
+              "type": "string"
+            },
+            {
+              "id": "2f650d02-e1c1-4d49-b9a6-8f0a0e50cf34",
+              "name": "Status",
+              "value": "Unpublished",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1824,
+        -656
+      ],
+      "id": "918d5d53-3a70-4ad3-abf1-21e475f289d7",
+      "name": "Set"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url_web }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1600,
+        -656
+      ],
+      "id": "3d186cc1-6134-4af9-b55f-cbb6c734e17f",
+      "name": "Obtener HTML"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2048,
+        -560
+      ],
+      "id": "757d6223-bf8a-4590-9584-f149d7e74054",
+      "name": "Ejecución Manual"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $input.first().json.data;\nconst clean = html\n  .replace(/<script[\\s\\S]*?<\\/script>/gi, '')\n  .replace(/<style[\\s\\S]*?<\\/style>/gi, '')\n  .replace(/<[^>]+>/g, ' ')\n  .replace(/\\s+/g, ' ')\n  .trim();\n\nreturn [{ text: clean.slice(0, 8000) }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1376,
+        -656
+      ],
+      "id": "0bd96ee9-8502-46a7-be2e-d377332096dd",
+      "name": "Limpìar Output"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -2048,
+        -752
+      ],
+      "id": "c6eae03f-1848-46eb-8286-05e18e38f505",
+      "name": "Cron",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Dmv-XcSG59g1ktLPGRJRBVrxYOpxRPYFoh6zbDcKnRU",
+          "mode": "list",
+          "cachedResultName": "WP Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Dmv-XcSG59g1ktLPGRJRBVrxYOpxRPYFoh6zbDcKnRU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Pruebas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Dmv-XcSG59g1ktLPGRJRBVrxYOpxRPYFoh6zbDcKnRU/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1152,
+        -656
+      ],
+      "id": "29786ce1-f06a-4e75-b740-22b44c4d01b4",
+      "name": "Obtener Posts",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WIlFz1tEvPZY3dpr",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function norm(s) {\n  return (s || '')\n    .toString()\n    .trim()\n    .toLowerCase()\n    .normalize('NFD')                \n    .replace(/[\\u0300-\\u036f]/g, '')\n    .replace(/[^a-z0-9\\s]/g, '')      \n    .replace(/\\s+/g, ' ');\n}\n\nconst rows = $input.all();\n\nconst existingTopics = rows\n  .map(r => norm(r.json.Topic))\n  .filter(Boolean);\n\nconst existingSet = Array.from(new Set(existingTopics));\n\nreturn [{\n  json: {\n    existingTopics: existingSet,\n    existingCount: existingSet.length,\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -928,
+        -656
+      ],
+      "id": "ca0fcfe1-5ffc-4124-a90f-72f0a1aaa925",
+      "name": "Crear Lista"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "HTTP-Referer",
+              "value": "https://n8n.imperio-barber.com"
+            },
+            {
+              "name": "X-Title",
+              "value": "n8n-wp-agent"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"openai/gpt-oss-120b\",\n  \"temperature\": 0.7,\n  \"max_tokens\": 2200,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Eres un estratega de contenidos SEO. Devuelve SOLO JSON válido (sin markdown, sin explicaciones).\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Genera EXACTAMENTE {{ $('Set').item.json.num_posts }} ideas de posts en {{ $('Set').item.json.language }}.\\n\\nReglas:\\n- NO repitas ni reformules temas similares a estos ya existentes:\\n{{ $json.existingTopics }}\\n- Ideas específicas, accionables y alineadas con el negocio.\\n\\nContexto (texto de la web):\\n{{ $('Limpìar Output').item.json.text }}\\n\\nDevuelve SOLO un array JSON válido con esta estructura:\\n[\\n  {\\\"titulo\\\":\\\"\\\",\\\"descripcion\\\":\\\"\\\"}\\n]\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -704,
+        -656
+      ],
+      "id": "f75e0b28-d956-4001-aab0-15b62d5a7aeb",
+      "name": "Crear Ideas",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "ahfuL691zIodq6ye",
+          "name": "Groq API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const content = $node[\"Crear Ideas\"].json.choices?.[0]?.message?.content;\n\nif (!content) {\n  throw new Error(\"No encuentro choices[0].message.content en 'Crear Ideas'\");\n}\n\nlet ideas;\ntry {\n  ideas = JSON.parse(content);\n} catch (e) {\n  throw new Error(\"El content no es JSON válido. Revisa salida del modelo: \" + e.message);\n}\n\nif (!Array.isArray(ideas)) {\n  throw new Error(\"La IA no devolvió un array JSON. Devuelve: \" + typeof ideas);\n}\n\nreturn ideas.map(i => ({\n  json: {\n    titulo: (i.titulo || \"\").trim(),\n    descripcion: (i.descripcion || \"\").trim()\n    \n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        -656
+      ],
+      "id": "752f92d2-cd97-4a50-84bc-22c7ad90c447",
+      "name": "Parsear Ideas"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1) Parsear ideas desde Crear Ideas (choices[0].message.content)\nconst content = $node[\"Crear Ideas\"].json.choices?.[0]?.message?.content;\n\nif (!content) {\n  throw new Error(\"No encuentro choices[0].message.content en 'Crear Ideas'\");\n}\n\nlet ideas;\ntry {\n  ideas = JSON.parse(content);\n} catch (e) {\n  throw new Error(\"El content no es JSON válido. Revisa salida del modelo: \" + e.message);\n}\n\nif (!Array.isArray(ideas)) {\n  throw new Error(\"La IA no devolvió un array JSON.\");\n}\n\n// 2) Helpers\nfunction norm(s) {\n  return (s || \"\")\n    .toString()\n    .trim()\n    .toLowerCase()\n    .normalize(\"NFD\")\n    .replace(/[\\u0300-\\u036f]/g, \"\")\n    .replace(/[^a-z0-9\\s]/g, \"\")\n    .replace(/\\s+/g, \" \");\n}\n\nfunction formatDateES(d) {\n  const dd = String(d.getDate()).padStart(2, \"0\");\n  const mm = String(d.getMonth() + 1).padStart(2, \"0\");\n  const yyyy = d.getFullYear();\n  return `${dd}/${mm}/${yyyy}`;\n}\n\n// 3) Dedupe contra los títulos ya existentes en el Sheet\n// (Tu nodo \"Crear Lista\" debe estar leyendo la columna \"Titulo\" o \"Topic\" y guardándolo en existingTopics)\nconst existing = $node[\"Crear Lista\"].json.existingTopics || [];\nconst existingSet = new Set(existing.map(norm));\n\n// 4) Config desde tu Set (según tu captura)\nconst tono = $node[\"Set\"].json.tono || \"profesional y cercano\";\nconst defaultStatus = $node[\"Set\"].json.Status || \"Unpublished\";\nconst defaultWpStatus = $node[\"Set\"].json.wp_status || \"draft\";\n\n// 5) Calcular lunes de la semana actual y crear 7 fechas (lunes→domingo)\nconst today = new Date();\nconst day = today.getDay(); // 0=domingo, 1=lunes...\nconst diffToMonday = day === 0 ? -6 : 1 - day;\nconst monday = new Date(today);\nmonday.setDate(today.getDate() + diffToMonday);\nmonday.setHours(9, 0, 0, 0);\n\n// 6) Construir items finales para Google Sheets (columnas: Fecha, Titulo, Descripcion, Tono, Status, wp_status)\nconst out = [];\nlet idx = 0;\n\nfor (const i of ideas) {\n  const titulo = (i.titulo || \"\").trim();\n  const descripcion = (i.descripcion || \"\").trim();\n  if (!titulo) continue;\n\n  const key = norm(titulo);\n  if (!key) continue;\n  if (existingSet.has(key)) continue;\n\n  const date = new Date(monday);\n  date.setDate(monday.getDate() + idx);\n\n  out.push({\n    json: {\n      Fecha: formatDateES(date), // dd/mm/yyyy\n      Titulo: titulo,\n      Descripcion: descripcion,\n      Tono: tono,\n      Status: defaultStatus,\n      wp_status: defaultWpStatus\n    }\n  });\n\n  existingSet.add(key);\n  idx++;\n  if (idx >= 7) break;\n}\n\nif (out.length < 7) {\n  throw new Error(\n    `Solo pude obtener ${out.length}/7 ideas únicas. Sube num_posts (ej: 14-20) o amplía el contexto.`\n  );\n}\n\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        -656
+      ],
+      "id": "e0121365-12a5-4c4c-8f1e-6de59a24c6fd",
+      "name": "Generar Fechas"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Obtener HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener HTML": {
+      "main": [
+        [
+          {
+            "node": "Limpìar Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejecución Manual": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpìar Output": {
+      "main": [
+        [
+          {
+            "node": "Obtener Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cron": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Posts": {
+      "main": [
+        [
+          {
+            "node": "Crear Lista",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Lista": {
+      "main": [
+        [
+          {
+            "node": "Crear Ideas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Ideas": {
+      "main": [
+        [
+          {
+            "node": "Parsear Ideas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear Ideas": {
+      "main": [
+        [
+          {
+            "node": "Generar Fechas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar Fechas": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "e40bc7f1-4fc9-4a96-94e0-eeb3f143b42f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bc24dc3ab563f700b8a8f328869926f7bcf30960baf9aa9508e047548740febc"
+  },
+  "id": "dQ1GD5IQTfxKPcHu_UnjB",
+  "tags": []
+}
