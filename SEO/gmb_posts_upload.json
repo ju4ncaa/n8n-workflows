@@ -1,0 +1,374 @@
+{
+  "name": "gmb_posts_upload",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 10 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -608,
+        208
+      ],
+      "id": "699b7cd9-a6ec-40a2-b98b-9d0d60f04a09",
+      "name": "Tarea cron",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        400
+      ],
+      "id": "8dff4b8b-3b1d-4372-ba02-e92aa2e4b298",
+      "name": "Ejecuci\u00f3n manual"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -384,
+        304
+      ],
+      "id": "6527f46f-745d-4618-95c9-41e3c2b385b8",
+      "name": "Obtener filas"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "image/png"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"inputs\": \"{{ $json.imagen_sugerida }}\",\n  \"options\": {\n    \"wait_for_model\": true\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -160,
+        304
+      ],
+      "id": "501eeeae-943a-4be8-a2d6-20a59c5595c2",
+      "name": "Generar imagen"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c5390c47-3091-4c3d-9284-6822dd63e571",
+              "name": "imageUrl",
+              "value": "={{ $json.data.url }}",
+              "type": "string"
+            },
+            {
+              "id": "62a7f315-bf59-41d8-99ec-f071ff882896",
+              "name": "title",
+              "value": "={{ $('Obtener filas').item.json.titulo }}",
+              "type": "string"
+            },
+            {
+              "id": "9375983e-74b4-4a3e-9208-cae18fbab71f",
+              "name": "body",
+              "value": "={{ $('Obtener filas').item.json.texto }}",
+              "type": "string"
+            },
+            {
+              "id": "69143259-e4f7-44bf-ac9a-8b96df7648f6",
+              "name": "cta",
+              "value": "={{ $('Obtener filas').item.json.cta }}",
+              "type": "string"
+            },
+            {
+              "id": "5d4ec4b4-786b-4aa8-8f5e-bb426f70e3c3",
+              "name": "link",
+              "value": "={{ $('Obtener filas').item.json.enalce }}",
+              "type": "string"
+            },
+            {
+              "id": "f9e339b5-cd00-499b-8871-edb0e2413a54",
+              "name": "row_number",
+              "value": "={{ $('Obtener filas').item.json.row_number }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        304
+      ],
+      "id": "2b9565c3-7914-48d8-b14a-b5f3afaefef2",
+      "name": "Set"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "destinationKey": "imageBase64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        304
+      ],
+      "id": "4e0d9f2e-1f12-40ca-9b8a-01ca2da88e2e",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.imgbb.com/1/upload",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image",
+              "value": "={{ $json.imageBase64 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        272,
+        304
+      ],
+      "id": "77da0b73-7d76-4c7c-a108-759331a9d5b6",
+      "name": "ImgBB"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://mybusiness.googleapis.com/v4/accounts/ACCOUNT_ID/locations/LOCATION_ID/localPosts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"languageCode\": \"es\",\n  \"topicType\": \"STANDARD\",\n  \"summary\": \"{{ $json.title }}\\n\\n{{ $json.body }}\",\n  \"callToAction\": {\n    \"actionType\": \"LEARN_MORE\",\n    \"url\": \"{{ $json.link }}\"\n  },\n  \"media\": [\n    {\n      \"mediaFormat\": \"PHOTO\",\n      \"sourceUrl\": \"{{ $json.imageUrl }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        304
+      ],
+      "id": "67e7d210-1ef8-4859-8716-c48f539356a6",
+      "name": "Publicaci\u00f3n GMB"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        880,
+        304
+      ],
+      "id": "5b635ae1-a110-4d54-9d02-266f33d06959",
+      "name": "Actualizar status"
+    },
+    {
+      "parameters": {
+        "emailFormat": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1104,
+        304
+      ],
+      "id": "c6af16ea-87d2-49d6-ba56-3bb013ed93e4",
+      "name": "Notificar subida"
+    },
+    {
+      "parameters": {
+        "content": "## Publicaci\u00f3n autom\u00e1tica de posts desde Excel\n\nEste workflow automatiza la creaci\u00f3n y publicaci\u00f3n de contenido para Google Business Profile usando datos de un Excel.\n\n#### \u00bfQu\u00e9 hace en resumen?\n\n1. Lee publicaciones pendientes desde un Excel  \n2. Genera una imagen autom\u00e1ticamente con IA a partir de un prompt  \n3. Sube la imagen a un hosting para obtener una URL p\u00fablica  \n4. Publica el contenido con imagen en Google Business Profile  \n5. Marca la fila como \u201cpublicado\u201d para no repetirla  \n6. Env\u00eda una notificaci\u00f3n de confirmaci\u00f3n  ",
+        "height": 416,
+        "width": 1008,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        -272
+      ],
+      "id": "2a3ee6e0-57b2-42dd-bb4c-6f3daf7b826b",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Tarea cron": {
+      "main": [
+        [
+          {
+            "node": "Obtener filas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejecuci\u00f3n manual": {
+      "main": [
+        [
+          {
+            "node": "Obtener filas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener filas": {
+      "main": [
+        [
+          {
+            "node": "Generar imagen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar imagen": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Publicaci\u00f3n GMB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "ImgBB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ImgBB": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publicaci\u00f3n GMB": {
+      "main": [
+        [
+          {
+            "node": "Actualizar status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar status": {
+      "main": [
+        [
+          {
+            "node": "Notificar subida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
