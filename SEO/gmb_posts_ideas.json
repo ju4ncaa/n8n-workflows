@@ -1,0 +1,692 @@
+{
+  "name": "gmb_posts_ideas",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -2304,
+        -272
+      ],
+      "id": "e61b43b4-7b7b-4425-9380-621717efc402",
+      "name": "Cron",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2304,
+        -80
+      ],
+      "id": "2c3df106-8e6e-4bd2-9666-630c359fe8fd",
+      "name": "Ejecuci\u00f3n manual"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f070fcbe-33da-4f2a-9763-8e9fe08e0155",
+              "name": "url_web",
+              "value": "https://www.bujarrabal.com/",
+              "type": "string"
+            },
+            {
+              "id": "7002ff9b-20c9-4efb-9480-ac6788711b15",
+              "name": "num_ideas",
+              "value": "4",
+              "type": "string"
+            },
+            {
+              "id": "fc254cae-2d1c-4a21-a26d-2f85ef4bbb2e",
+              "name": "max_urls",
+              "value": "60",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1968,
+        -192
+      ],
+      "id": "81f29fd1-b9d3-4020-8d77-32944d1c1671",
+      "name": "Set"
+    },
+    {
+      "parameters": {
+        "jsCode": "const xml = $json.data || \"\";\nconst maps = [...xml.matchAll(/<loc>(.*?)<\\/loc>/g)].map(m => m[1].trim());\n\nconst allowed = maps.filter(u =>\n  u.includes(\"post-sitemap.xml\") || u.includes(\"page-sitemap.xml\")\n);\n\nreturn { sitemaps: allowed };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1504,
+        -112
+      ],
+      "id": "30134868-ea0f-4ea6-a3f2-015feb50fe2a",
+      "name": "Extraer Sitemaps"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url_web }}/sitemap_index.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1744,
+        -112
+      ],
+      "id": "8661f7a2-c191-4ea9-888b-e701d7d59bb4",
+      "name": "Obtener Sitemap"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "sitemaps",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        -112
+      ],
+      "id": "4e63787d-6212-46f2-a6b2-3ab0448c8c3c",
+      "name": "Split"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.sitemaps }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1152,
+        -112
+      ],
+      "id": "99a27f2f-95ca-4421-812c-a75252cc637a",
+      "name": "Obtener URLs"
+    },
+    {
+      "parameters": {
+        "jsCode": "const xml = $json.data || \"\";\n\nlet urls = [...xml.matchAll(/<loc>(.*?)<\\/loc>/g)].map(m => m[1].trim());\n\nfunction keep(u){\n  if (u.includes(\"/contacto\")) return false;\n  if (u.includes(\"/aviso-legal\")) return false;\n  if (u.includes(\"/politica\")) return false;\n  if (u.includes(\"/cookies\")) return false;\n  if (u.includes(\"/author/\")) return false;\n  if (u.includes(\"/tag/\")) return false;\n  if (u.includes(\"/category/\")) return false;\n  if (u.includes(\"?\")) return false;\n  return true;\n}\n\nurls = urls.filter(keep);\n\nurls.sort((a,b)=>{\n  const pa = a.includes(\"/servicios/\") ? 0 : 1;\n  const pb = b.includes(\"/servicios/\") ? 0 : 1;\n  return pa - pb;\n});\n\nreturn [{ urls: urls.slice(0, $('Set').first().json.max_urls) }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -976,
+        -112
+      ],
+      "id": "6468ee82-77fc-4295-b707-5bb6bc470638",
+      "name": "Extraer URLs <loc>"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "urls",
+        "options": {
+          "destinationFieldName": "page_url"
+        }
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        -112
+      ],
+      "id": "e5a0bcf1-6bd2-4379-b4d7-f5cf3902f3b5",
+      "name": "Split1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.page_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -640,
+        -112
+      ],
+      "id": "60d2ce43-c28f-4857-9f41-574d085a0164",
+      "name": "Obtener HTML"
+    },
+    {
+      "parameters": {
+        "jsCode": "const url = $json.page_url;\nlet html = $json.data || \"\";\n\nhtml = html.replace(/<script[\\s\\S]*?<\\/script>/gi, \"\");\nhtml = html.replace(/<style[\\s\\S]*?<\\/style>/gi, \"\");\n\nhtml = html.replace(/<nav[\\s\\S]*?<\\/nav>/gi, \"\");\nhtml = html.replace(/<footer[\\s\\S]*?<\\/footer>/gi, \"\");\n\nlet text = html.replace(/<[^>]+>/g, \" \");\ntext = text.replace(/\\s+/g, \" \").trim();\n\nif (text.length > 3500) text = text.slice(0, 3500);\n\nreturn [{text}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        -112
+      ],
+      "id": "cbcd087e-7b7c-4ff2-aac7-cd81fe00a3ea",
+      "name": "Limpiar Output"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "HTTP-Referer",
+              "value": "https://n8n.imperio-barber.com"
+            },
+            {
+              "name": "X-Title",
+              "value": "n8n-wp-agent"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"openai/gpt-oss-120b\",\n  \"temperature\": 0.65,\n  \"max_tokens\": 2600,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Eres un estratega de contenidos para Google Business Profile de una asesor\u00eda fiscal y legal en Espa\u00f1a (BUJARRABAL). Devuelve SOLO JSON v\u00e1lido: sin markdown, sin explicaciones, sin texto fuera del JSON.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Genera EXACTAMENTE 2 ideas de posts para Google Business Profile.\\n\\nNO repitas NI reformules temas similares a estos ya existentes:\\n{{ $json.existingTopics }}\\n\\nContexto (texto limpio de la web):\\n{{ $json.concatenated_text }}\\n\\nDevuelve SOLO un array JSON v\u00e1lido con esta estructura EXACTA:\\n[\\n  {\\n    \\\"fecha\\\":\\\"\\\",\\n    \\\"tema\\\":\\\"\\\",\\n    \\\"publico_objetivo\\\":\\\"\\\",\\n    \\\"titulo\\\":\\\"\\\",\\n    \\\"texto\\\":\\\"\\\",\\n    \\\"palabras_clave\\\":\\\"\\\",\\n    \\\"cta\\\":\\\"\\\",\\n    \\\"enlace\\\":\\\"\\\",\\n    \\\"imagen_sugerida\\\":\\\"\\\"\\n  }\\n]\\n\\nReglas de copy:\\n- \\\"texto\\\" debe tener entre 400 y 1200 caracteres aprox, estilo cercano y profesional.\\n- Emojis: en \\\"titulo\\\" incluye EXACTAMENTE 1 emoji; en \\\"texto\\\" incluye 0 o 1 emoji (nunca m\u00e1s). No uses emojis en exceso.\\n- \\\"cta\\\" debe ser corta (ej: \\\"Solicita asesoramiento\\\", \\\"Reserva tu cita\\\").\\n- \\\"enlace\\\" debe ser una URL de bujarrabal.com relevante al tema.\\n- \\\"fecha\\\" no la inventes: deja \\\"\\\" si no hay info.\\n\\nReglas de IMAGEN (muy importante):\\n- \\\"imagen_sugerida\\\" NO debe ser un nombre de archivo. Debe ser un PROMPT listo para generar una imagen.\\n- Mant\u00e9n SIEMPRE el estilo visual BUJARRABAL:\\n  \u2022 proporci\u00f3n 4:3\\n  \u2022 estilo hiperrealista, profesional y sobrio\\n  \u2022 iluminaci\u00f3n clara, neutra y uniforme\\n  \u2022 predominio de tonos azules corporativos (ropa, carpetas, detalles del entorno)\\n  \u2022 despacho moderno, c\u00e1lido y profesional\\n  \u2022 escena humana y cercana (sin dramatismo), con asesor/abogado y cliente(s) revisando documentos del tema\\n  \u2022 sin textos, sin logos, sin marcas de agua\\n- El prompt debe adaptar la escena al tema del post (Renta, deducciones, revisi\u00f3n de borrador, errores, plazos, etc.).\\n\\nSalida: SOLO JSON v\u00e1lido.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        112,
+        -368
+      ],
+      "id": "3596eb72-fb13-4d6c-bea2-093e66be00f9",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = items.map(i => i.json);\n\nfunction pick(r, keys) {\n  for (const k of keys) if (r[k] != null && String(r[k]).trim() !== \"\") return String(r[k]);\n  return \"\";\n}\n\nconst lines = [];\nfor (const r of rows) {\n  const fecha  = pick(r, [\"fecha\",\"Fecha\"]);\n  const tema   = pick(r, [\"tema\",\"Tema\"]);\n  const titulo = pick(r, [\"titulo\",\"Titulo\",\"T\u00edtulo\"]);\n  const enlace = pick(r, [\"enlace\",\"Enlace\",\"enalce\",\"URL\",\"Url\"]);\n\n  const line = `${fecha} | ${tema} | ${titulo} | ${enlace}`.trim();\n  if (line !== \"|||\") lines.push(`- ${line}`);\n}\n\nconst existingTopics = lines.slice(0, 150).join(\"\\n\");\n\nreturn [{ existingTopics }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -768,
+        -368
+      ],
+      "id": "7987c6e6-ba41-4611-8712-ff762a217c24",
+      "name": "Obtener Topics"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -144,
+        -368
+      ],
+      "id": "b5f92879-b055-4930-82b1-100bd3a74361",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "17EDVgVIu9r6UxX73fQBN5Hg0gJu1cpxO7dYlHCcnhtU",
+          "mode": "list",
+          "cachedResultName": "Publicaciones",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17EDVgVIu9r6UxX73fQBN5Hg0gJu1cpxO7dYlHCcnhtU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Bujarrabal",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17EDVgVIu9r6UxX73fQBN5Hg0gJu1cpxO7dYlHCcnhtU/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1344,
+        -368
+      ],
+      "id": "27b54146-66a3-4d6e-a245-05458d611f92",
+      "name": "Obtener Posts"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "text",
+              "separateBy": "\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        -288,
+        -112
+      ],
+      "id": "96d1b2dd-ff76-4550-bb4d-59f058a76c17",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst root = Array.isArray(item) ? item[0] : item;\n\nlet content = root?.choices?.[0]?.message?.content;\n\nif (content === undefined || content === null) {\n  throw new Error('No encuentro choices[0].message.content en el output del HTTP node.');\n}\n\nlet parsed;\nif (typeof content === 'string') {\n  content = content.trim();\n  parsed = JSON.parse(content);\n} else {\n  parsed = content;\n}\n\nif (Array.isArray(parsed)) parsed = { posts: parsed };\nif (!parsed.posts || !Array.isArray(parsed.posts)) {\n  throw new Error('El JSON parseado no contiene \"posts\" como array.');\n}\n\n\nconst publishDays = [1, 3, 5];\n\nconst respectExistingFecha = false;\n\nconst pushToNextWeekIfWeekend = true;\n\nconst fmt = (d) => {\n  const yyyy = d.getFullYear();\n  const mm = String(d.getMonth() + 1).padStart(2, '0');\n  const dd = String(d.getDate()).padStart(2, '0');\n  return `${yyyy}-${mm}-${dd}`;\n};\n\nconst getMonday = (date) => {\n  const d = new Date(date);\n  const day = d.getDay();\n  const diff = (day === 0 ? -6 : 1) - day; \n  d.setDate(d.getDate() + diff);\n  d.setHours(9, 0, 0, 0);\n  return d;\n};\n\nconst today = new Date();\nlet baseMonday = getMonday(today);\n\nif (pushToNextWeekIfWeekend) {\n  const dow = today.getDay();\n  if (dow === 0 || dow === 6) {\n    baseMonday.setDate(baseMonday.getDate() + 7);\n  }\n}\n\nconst weekDates = publishDays.map((dow) => {\n  const d = new Date(baseMonday);\n  d.setDate(baseMonday.getDate() + (dow - 1));\n  return fmt(d);\n});\n\nparsed.posts = parsed.posts.map((p, i) => {\n  const out = { ...p };\n\n  if (!respectExistingFecha || !out.fecha || String(out.fecha).trim() === '') {\n    out.fecha = weekDates[i % weekDates.length];\n  }\n\n  return out;\n});\n\nreturn [{ json: parsed }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        -368
+      ],
+      "id": "2df2a8e2-8c7c-45ff-9aed-5354c83bad51",
+      "name": "Parsear JSON"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "posts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        576,
+        -368
+      ],
+      "id": "9c318123-da0d-4ecd-a2af-0d56d7eecda9",
+      "name": "Split2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "17EDVgVIu9r6UxX73fQBN5Hg0gJu1cpxO7dYlHCcnhtU",
+          "mode": "list",
+          "cachedResultName": "Publicaciones",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17EDVgVIu9r6UxX73fQBN5Hg0gJu1cpxO7dYlHCcnhtU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Bujarrabal",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17EDVgVIu9r6UxX73fQBN5Hg0gJu1cpxO7dYlHCcnhtU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{ $json.fecha }}",
+            "tema": "={{ $json.tema }}",
+            "publico_objetivo": "={{ $json.publico_objetivo }}",
+            "titulo": "={{ $json.titulo }}",
+            "texto": "={{ $json.texto }}",
+            "palabras_clave": "={{ $json.palabras_clave }}",
+            "cta": "={{ $json.cta }}",
+            "enalce": "={{ $json.enlace }}",
+            "imagen_sugerida": "={{ $json.imagen_sugerida }}",
+            "status": "Unpublished"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tema",
+              "displayName": "tema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "publico_objetivo",
+              "displayName": "publico_objetivo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "titulo",
+              "displayName": "titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "texto",
+              "displayName": "texto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "palabras_clave",
+              "displayName": "palabras_clave",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cta",
+              "displayName": "cta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "enalce",
+              "displayName": "enalce",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "imagen_sugerida",
+              "displayName": "imagen_sugerida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        784,
+        -368
+      ],
+      "id": "97f57a70-70ca-4a42-af09-63e035e93b2a",
+      "name": "Append row in sheet"
+    },
+    {
+      "parameters": {
+        "content": "### GBP Post Ideas\n\n**Objetivo:** Generar ideas nuevas para Google Business Profile basadas en la web, evitar duplicados y guardarlas con fecha programada.\n\n**Flujo:**\n1. Leer posts existentes (Sheets)  \n2. Extraer y limpiar contenido de la web  \n3. Unir contexto + temas ya usados  \n4. IA genera 2 ideas en JSON  \n5. Parsear y asignar fechas (L/M/V)  \n6. Separar los posts  \n7. Guardar en Google Sheets  \n\n**Salida por fila:**  \nTema \u00b7 T\u00edtulo \u00b7 Texto \u00b7 CTA \u00b7 Enlace \u00b7 Prompt de imagen \u00b7 Fecha  \n\n**Dependencias:**  \nGroq API \u00b7 Google Sheets",
+        "height": 416,
+        "width": 1056,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2272,
+        -912
+      ],
+      "id": "410fe9c5-45ec-473b-acf0-10a8422a3b6a",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Cron": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejecuci\u00f3n manual": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Obtener Sitemap",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Obtener Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Sitemap": {
+      "main": [
+        [
+          {
+            "node": "Extraer Sitemaps",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer Sitemaps": {
+      "main": [
+        [
+          {
+            "node": "Split",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split": {
+      "main": [
+        [
+          {
+            "node": "Obtener URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener URLs": {
+      "main": [
+        [
+          {
+            "node": "Extraer URLs <loc>",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer URLs <loc>": {
+      "main": [
+        [
+          {
+            "node": "Split1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split1": {
+      "main": [
+        [
+          {
+            "node": "Obtener HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener HTML": {
+      "main": [
+        [
+          {
+            "node": "Limpiar Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpiar Output": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Topics": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Posts": {
+      "main": [
+        [
+          {
+            "node": "Obtener Topics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Parsear JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear JSON": {
+      "main": [
+        [
+          {
+            "node": "Split2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split2": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
