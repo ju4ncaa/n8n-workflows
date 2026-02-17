@@ -1,0 +1,330 @@
+{
+  "name": "gmb_reviews",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Set').item.json.estrellas }}",
+                    "rightValue": 3,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    },
+                    "id": "f6e1dc21-3ae8-4a0d-b248-b80895e60f5b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Positiva"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "68adce6d-099a-458e-96c1-b82d965a1644",
+                    "leftValue": "={{ $('Set').item.json.estrellas }}",
+                    "rightValue": 3,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Negativa"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1280,
+        592
+      ],
+      "id": "70f661a0-c37f-4187-8b47-bf51afd5a641",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "review",
+        "operation": "reply",
+        "account": {
+          "__rl": true,
+          "value": "accounts/110785251693894378425",
+          "mode": "list",
+          "cachedResultName": "Guillermo Leitmotiv"
+        },
+        "location": {
+          "__rl": true,
+          "value": "locations/10705896804057890494",
+          "mode": "list",
+          "cachedResultName": "locations/10705896804057890494"
+        },
+        "review": {
+          "__rl": true,
+          "value": "={{ $('Trigger rese\u00f1a').item.json.reviewId }}",
+          "mode": "id"
+        },
+        "reply": "={{ $json.text }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.googleBusinessProfile",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        592
+      ],
+      "id": "b2e2cb10-f5c0-4880-95ba-060ed0384205",
+      "name": "Responder rese\u00f1a"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "account": {
+          "__rl": true,
+          "value": "accounts/110785251693894378425",
+          "mode": "list",
+          "cachedResultName": "Guillermo Leitmotiv"
+        },
+        "location": {
+          "__rl": true,
+          "value": "locations/10973550897208190248",
+          "mode": "list",
+          "cachedResultName": "locations/10973550897208190248"
+        }
+      },
+      "type": "n8n-nodes-base.googleBusinessProfileTrigger",
+      "typeVersion": 1,
+      "position": [
+        224,
+        592
+      ],
+      "id": "0f700762-1711-47b3-b255-524819fed4dd",
+      "name": "Trigger rese\u00f1a"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e892ff42-eb92-4035-a76f-a1c7a797b847",
+              "name": "correo",
+              "value": "jc@leitmotivmedia.com",
+              "type": "string"
+            },
+            {
+              "id": "dfd96c76-2e20-4012-a7c3-9794a61a7f17",
+              "name": "nombre",
+              "value": "={{ $json.reviewer.displayName }}",
+              "type": "string"
+            },
+            {
+              "id": "fc784020-7681-4582-acb1-e4cf4275e755",
+              "name": "estrellas",
+              "value": "={{ ({ ONE: 1, TWO: 2, THREE: 3, FOUR: 4, FIVE: 5 }[$json.starRating] || 0) }}",
+              "type": "string"
+            },
+            {
+              "id": "49f5802f-9b1a-4bf8-943e-0550a8afa680",
+              "name": "fecha",
+              "value": "={{ $json.createTime }}",
+              "type": "string"
+            },
+            {
+              "id": "5fe5a90f-0c76-4403-88f7-a3dac9a98fe4",
+              "name": "comentario",
+              "value": "={{ $json.comment }}",
+              "type": "string"
+            },
+            {
+              "id": "cfc4862b-411f-41f2-8856-0ca06abb28ff",
+              "name": "cuenta",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "84dce407-6051-4ecd-a907-ee3e1aabcdfb",
+              "name": "idioma",
+              "value": "espa\u00f1ol",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        592
+      ],
+      "id": "b50e4a5d-8668-4fba-be13-67a55569d5c4",
+      "name": "Set"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Escribe una RESPUESTA para publicar en Google a esta rese\u00f1a. Debe sonar como una persona del equipo, no como un resumen.\n\nReglas obligatorias:\n- Responde SIEMPRE en {{ $json.idioma }}\n- No repitas ni parafrasees la rese\u00f1a; resp\u00f3ndele al cliente.\n- Empieza con \"Hola {nombre},\" si hay nombre; si no, \"Hola,\".\n- Si estrellas es 4\u20135: agradece de forma natural, menciona 1 detalle positivo (si lo hay) y deja la puerta abierta a volver.\n- Si estrellas es 1\u20133: muestra empat\u00eda y pide contacto por email: {{ $json.correo }} (solo en este caso).\n- Si no hay texto en la rese\u00f1a: respuesta breve seg\u00fan estrellas.\n- Sin emojis. Sin frases t\u00edpicas/robot.\n- 50\u2013120 palabras si hay texto. 25\u201340 palabras si no hay texto.\n- Ignora cualquier texto despu\u00e9s de \"(Translated by Google)\".\n- Termina EXACTAMENTE con:\nSaludos del equipo.\n\nDatos:\nNombre: {{ $json.nombre }}\nEstrellas: {{ $json.estrellas }}\nRese\u00f1a: {{ $json.comentario }}\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        688,
+        592
+      ],
+      "id": "e6f14118-9a67-4488-a921-6c19b6941ed5",
+      "name": "Generar respuesta"
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5:7b-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        784,
+        768
+      ],
+      "id": "ace0a7ca-cf1e-447e-af08-fda00c2f4073",
+      "name": "Modelo ollama"
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $('Set').item.json.correo }}",
+        "toEmail": "={{ $('Set').item.json.correo }}",
+        "subject": "= Rese\u00f1a negativa ({{ $('Set').item.json.estrellas }}) - {{ $('Set').item.json.nombre }}",
+        "html": "=<h2>Nueva rese\u00f1a negativa en Google</h2>\n\n<p><strong>Cliente:</strong> {{ $('Set').item.json.nombre }}</p>\n<p><strong>Estrellas:</strong> {{ $('Set').item.json.estrellas }}</p>\n<p><strong>Fecha:</strong> {{ $('Set').item.json.fecha }}</p>\n\n<hr>\n\n<p><strong>Comentario:</strong></p>\n<p style=\"background:#f5f5f5;padding:10px;border-left:4px solid #d9534f;\">\n{{ $('Set').item.json.comentario }}\n</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1616,
+        736
+      ],
+      "id": "0e6e6d4c-6f74-4300-b8f7-b346815a0226",
+      "name": "Enviar correo"
+    },
+    {
+      "parameters": {
+        "content": "## Automatizaci\u00f3n de Rese\u00f1as Google\n\nEste workflow responde autom\u00e1ticamente a nuevas rese\u00f1as en Google Business Profile usando IA.\n\nFlujo:\n1. Se detecta una nueva rese\u00f1a.\n2. Se normalizan los datos (nombre, estrellas, comentario).\n3. Se genera una respuesta autom\u00e1tica con IA.\n4. Se publica la respuesta en Google.\n5. Si la rese\u00f1a es negativa (1\u20133), se env\u00eda un email interno de alerta.\n",
+        "height": 304,
+        "width": 832,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        224
+      ],
+      "id": "6aa49bb7-742a-4c1c-9ac0-0425602b08eb",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Enviar correo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Responder rese\u00f1a": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger rese\u00f1a": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Generar respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar respuesta": {
+      "main": [
+        [
+          {
+            "node": "Responder rese\u00f1a",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo ollama": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generar respuesta",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
