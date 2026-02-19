@@ -1,0 +1,375 @@
+{
+  "name": "linkedin_content",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1648,
+        -224
+      ],
+      "id": "e75a8121-0d2f-404f-a7f2-18ddf48a9e4e",
+      "name": "Cron"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Eres estratega de contenido para LinkedIn B2B.\n\nDevuelve EXCLUSIVAMENTE JSON v\u00e1lido.\nNo incluyas texto fuera del JSON.\nNo uses markdown.\nNo expliques nada.\n\nGenera 1 idea de post para LinkedIn con:\n\nNicho: IA aplicada a marketing B2B\nAudiencia: CMOs y responsables de Growth\nTono: directo, pr\u00e1ctico, sin humo\nObjetivo: generar autoridad y leads\n\nDevuelve este schema EXACTO:\n\n{\n  \"topic\": \"string\",\n  \"angle\": \"string\",\n  \"hook_style\": \"pregunta|dato|contraste|historia\",\n  \"key_points\": [\"string\",\"string\",\"string\"],\n  \"cta\": \"string\",\n  \"image_prompt\": \"string\"\n}\n\nReglas:\n- topic: 6-12 palabras\n- angle: una frase concreta\n- key_points: 3 puntos accionables\n- cta: pregunta final\n- image_prompt: descripci\u00f3n visual minimalista sin texto",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -1408,
+        -224
+      ],
+      "id": "14e83184-1c52-4070-ad5c-b8839a47b280",
+      "name": "Generar topic"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"topic\": \"string\",\n  \"angle\": \"string\",\n  \"hook_style\": \"pregunta\",\n  \"key_points\": [\"string\", \"string\", \"string\"],\n  \"cta\": \"string\",\n  \"image_prompt\": \"string\"\n}\n",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1344,
+        -80
+      ],
+      "id": "f884a76e-2103-4faf-acb4-214b0891622c",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5:7b-instruct",
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        -1456,
+        -64
+      ],
+      "id": "62b5f88b-59cc-4dc9-9eb1-297ecfe72b49",
+      "name": "Ollama Model"
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5:7b-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        -1344,
+        64
+      ],
+      "id": "0f0c96e8-47a1-46cc-91e4-de6252822329",
+      "name": "Ollama Model1"
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5:7b-instruct",
+        "options": {
+          "temperature": 0.6
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        -1056,
+        -64
+      ],
+      "id": "346cfff5-631a-455e-b53e-5b1d25591c8f",
+      "name": "Ollama Model2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Escribe un post de LinkedIn en espa\u00f1ol usando ESTA idea (JSON):\n\n{{ JSON.stringify($json.output, null, 2) }}\n\nDevuelve EXCLUSIVAMENTE un JSON v\u00e1lido con este schema:\n\n{\n  \"post_text\": \"string\"\n}\n\nReglas:\n- 900\u20131400 caracteres (aprox.)\n- Usa saltos de l\u00ednea (estilo LinkedIn)\n- Tono: directo, pr\u00e1ctico, sin humo\n- Incluye 1 hook al inicio basado en \"hook_style\"\n- Integra los 3 \"key_points\" como bullets o mini-secciones\n- Termina con la pregunta \"cta\"\n- NO incluyas hashtags\n- NO incluyas nada fuera del JSON\n",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -1056,
+        -224
+      ],
+      "id": "7125fed8-3245-483c-a6cf-0fc9365338bf",
+      "name": "Generar post"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"post_text\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -912,
+        -64
+      ],
+      "id": "c0780f21-a2a3-4281-84a2-521d07e5ac25",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "=application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"inputs\": \"{{$node['Generar topic'].json.output.image_prompt}}\",\n  \"parameters\": {\n    \"num_inference_steps\": 30,\n    \"guidance_scale\": 7.5\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -624,
+        -368
+      ],
+      "id": "126ac7d0-01f0-467b-b521-7721dea67130",
+      "name": "Generar imagen"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Genera hashtags y keywords SEO para este post de LinkedIn:\n\n{{ $json.output.post_text }}\n\nDevuelve SOLO JSON v\u00e1lido con este schema:\n\n{\n  \"hashtags\": [\"#tag1\",\"#tag2\",\"#tag3\",\"#tag4\",\"#tag5\",\"#tag6\",\"#tag7\",\"#tag8\"],\n  \"keywords\": [\"keyword1\",\"keyword2\",\"keyword3\",\"keyword4\",\"keyword5\"],\n  \"slug\": \"string\"\n}\n\nReglas:\n- 8 a 12 hashtags m\u00e1ximo, sin espacios, en espa\u00f1ol o mezcla ES/EN si aplica\n- keywords: 5 frases cortas tipo SEO (sin #)\n- slug: 3-6 palabras separadas por guiones, en min\u00fascula\n- Nada fuera del JSON\n",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -672,
+        -144
+      ],
+      "id": "c680b9c3-d25e-4dda-b806-acf1191c0471",
+      "name": "Generador hashtag / SEO"
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5:7b-instruct",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        16
+      ],
+      "id": "b1a038c6-50bd-4008-bd3f-947846423a01",
+      "name": "Ollama Model3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -288,
+        -240
+      ],
+      "id": "1936da6d-cb48-4f4a-84b4-28eabb3301fb",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -240
+      ],
+      "id": "4f5a85e0-988c-4d65-acdc-5a8d3321d236",
+      "name": "Crear post"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"hashtags\": [\"#tag\"],\n  \"keywords\": [\"keyword\"],\n  \"slug\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -544,
+        64
+      ],
+      "id": "60277b79-2c67-4180-9980-ad21657a6529",
+      "name": "Structured Output Parser2"
+    }
+  ],
+  "connections": {
+    "Cron": {
+      "main": [
+        [
+          {
+            "node": "Generar topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generar topic",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generar topic",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar topic": {
+      "main": [
+        [
+          {
+            "node": "Generar post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generar post",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generar post",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar post": {
+      "main": [
+        [
+          {
+            "node": "Generar imagen",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generador hashtag / SEO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generador hashtag / SEO",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar imagen": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generador hashtag / SEO": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Crear post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generador hashtag / SEO",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
